@@ -3,9 +3,21 @@
 We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets learn something new. 
 
 ## Day 80: Jenkins Chained Builds
+
+
+
 ## Day 79: Jenkins Deployment Job
+
+
+
 ## Day 78: Jenkins Conditional Pipeline
+
+
+
 ## Day 77: Jenkins Deploy Pipeline
+
+
+
 ## Day 76: Jenkins Project Security
 
 This lab was also pretty easy. After doing a bunch of aimless clicking, I googled the part of the prompt that said inherit permissions from parent ACL. This pointed me back towards the Matrix Authorization Strategy plugin. Once I installed that, I did more ClickOps but couldn't find what I was looking for. AI pointed me back to the job and said I needed to check Enable project-based security. Once I did that, I was able to add the `sam` and `roahn` users and give them the required permissions for this job. 
