@@ -1,14 +1,25 @@
 # 100 Days of DevOps with KodeKloud - Days 71 - 80
 
-We're now in the 60s! This is still mostly Kubernetes (K8s) labs but we'll end off running some basic Jenkins labs. Lets get it started. 
+We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets learn something new. 
 
 ## Day 80: Jenkins Chained Builds
 ## Day 79: Jenkins Deployment Job
 ## Day 78: Jenkins Conditional Pipeline
 ## Day 77: Jenkins Deploy Pipeline
 ## Day 76: Jenkins Project Security
+
+
+
 ## Day 75: Jenkins Slave Nodes
+
+This lab was a lot longer than I exected. We needed to create 3 agent nodes for the application servers. Before we did that, we needed to make sure the agents would come online by creating SSH credentials for them. So I needed to install SSH Build Agents (not SSH Agents) and Publis Over SSH plugins. Afterwards, I created SSH servers for each of the agents and tested my configuration. Next, I created agents for all three of the servers as specified in the lab requirements. They still didn't come online so I needed to go back into the agent configurations and change the option to `Launch by SSH` or something simliar to that. This prompted me to choose a server and then remake my credentials in the form of a Jenkins Credential for all 3 servers. After that, the agents were online one of them kept going offline. I looked at the logs and it appeared that the SSH session was still timing out. 
+
+I still hit enter and got the green check though. Mission accomplished. 
+
 ## Day 74: Jenkins Database Backup Job
+
+I knocked this out very swiftly on my own. So we were given the credentials and information for the database we needed to back up every ten minutes. We needed to configure a Jenkins pipeline to automate this process. I found this command online: `mysqldump -u [username] -p"[password]" [database_name] > [output_file].sql` that we can use in the future for the actual database dump job. We also needed this scp command `scp db_$(date +%F).sql natasha@ststor01:/home/natasha/db_backups/`. Everything else is straightforward. Just make sure you install Publish Over SSH first, test the connection to the machine you'll be starting from, and run the SSH commands from the previous lab (Day 73) from the source machine to the destination machine to make sure we don't run into that fingerprint and password prompt. Those two above commands should create the cron job. 
+
 ## Day 73: Jenkins Scheduled Jobs
 
 We need to build a job that copies log files from one server to another every 6 minutes. There's a cron like setting in the Jenkins jobs under Triggers. If you choose `Build periodically`, you can put a cron type of format here to say when to run this job. My format was `H/6 * * * *` which Jenkins will show you when this job will run. It shows every 6 minutes on here so this will suffice. 
