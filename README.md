@@ -10,7 +10,7 @@ We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets le
 
 
 
-## Day 75: Jenkins Slave Nodes
+## Day 75: Jenkins Agent Nodes
 
 This lab was a lot longer than I exected. We needed to create 3 agent nodes for the application servers. Before we did that, we needed to make sure the agents would come online by creating SSH credentials for them. So I needed to install SSH Build Agents (not SSH Agents) and Publis Over SSH plugins. Afterwards, I created SSH servers for each of the agents and tested my configuration. Next, I created agents for all three of the servers as specified in the lab requirements. They still didn't come online so I needed to go back into the agent configurations and change the option to `Launch by SSH` or something simliar to that. This prompted me to choose a server and then remake my credentials in the form of a Jenkins Credential for all 3 servers. After that, the agents were online one of them kept going offline. I looked at the logs and it appeared that the SSH session was still timing out. 
 
