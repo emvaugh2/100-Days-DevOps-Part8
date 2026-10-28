@@ -16,6 +16,43 @@ We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets le
 
 ## Day 77: Jenkins Deploy Pipeline
 
+Okay this part I'm more familiar with on the Jenkins side. I've created a few pipelines but never from scratch so I still need to memorize the syntax to a certain degree. Before we even get started, I installed the following plugins: Publish Over SSH, SSH Build Agent, Pipeline, and Matrix Authorization Strategy. I figured I would need majority of these. After that, I created the SSH server session under Systems for Application Server 01 `stapp01` and verified connectivity. I had to create the App Server 1 agent next with the root directory being `/home/sarah/jenkins_agent`. This caused me about 20 minutes worth of issues and I didn't know how to fix it. I'm also very sleepy. I asked AI what the issue was. There were a few differeht issues. #1 was the credentials we used for the SSH session under the Agent tab. We needed Tony's credentials instead of Sarah's which I figured at first. AI was wrong initially here. I also needed to change the launch credentials for the agent from Host Key Verification Strategy → Non verifying Verification Strategy. Then, AI pointed out Tony doesn't have rw permissions on the directory `/home/sarah/jenkins_agent` so we needed to run:
+
+```
+sudo mkdir -p /home/sarah/jenkins_agent
+sudo chown tony:tony /home/sarah/jenkins_agent
+sudo chown -R tony:tony /var/www/html
+```
+```
+sudo setfacl -m u:tony:x /home/sarah
+sudo setfacl -m u:tony:rwx /home/sarah/jenkins_agent
+```
+
+just to give Tony some type of permissions on the directory while keeping Sarah as the owner and group for it. Then, the last issue was `stapp01` didn't have the correct Java version. We needed to run `sudo dnf install -y java-17-openjdk` to upgrade it to the correct version. Finally the agent came online. What a headache. Lets run the Jenkins pipeline and see if it completes the lab. 
+
+```
+pipeline {
+    agent {
+        label 'stapp01'
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                sh '''
+                    cd /var/www/html
+                    git config --global --add safe.directory /var/www/html
+                    git pull
+                '''
+            }
+        }
+    }
+}
+```
+
+The job ran successfully after this and we were able to get the green check. This took 50 minutes believe it or not. I learned a lot though. 
+
+
 
 
 ## Day 76: Jenkins Project Security
