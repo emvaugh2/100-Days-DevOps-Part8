@@ -8,7 +8,45 @@ We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets le
 
 ## Day 79: Jenkins Deployment Job
 
+For this lab, we're focusing on automation. We want to make a change to our file and push it to our Gitea repo. Once we do this, it should automatically deploy our pipeline to pull the updated repo and then deploy the code to our application button. I forgot how to do this exactly so I'm relying on AI but before even consulting AI, I went installed the Publish Over SSH, SSH Build Agents, Pipeline, and Matrix Authorization Strategy plugins although I believe we'll only need the PoSSH and Pipeline plugins. I checked that `sarah` was the owner of `/var/www/html` as well as made sure the `httpd` service was enabled and running. I'm assuming the code will look similar to our previous labs which would be changing to the `/var/www/html` directory, checking out the right GitHub branch, and then doing a pull request to get the updated repo code to the local machine to display the new code. Here's the workflow AI provided:
 
+```
+Sarah edits code
+      ↓
+git push origin master
+      ↓
+Gitea
+      ↓
+Webhook / Jenkins SCM trigger
+      ↓
+Jenkins job starts automatically
+      ↓
+SSH to stapp01
+      ↓
+cd /home/sarah/web
+git pull origin master
+      ↓
+Copy ENTIRE repo contents
+      ↓
+/var/www/html
+      ↓
+Apache :8080
+      ↓
+App shows latest change
+```
+
+We're going to create a webhook. Go to the Gitea repo and navigate to the Code tab. Click clone and copy the HTTPS URL link. We also needed to install the Git and/or Gitea plugins. Now, under Source Management in the Jenkins job (choose Freestyle project instead of Pipeline), you should now see Git as an option. Paste the remote repo URL and use `sarah`'s credentials (make sure to create them). Then use the following commands to execute over SSH:
+
+```
+cd /home/sarah/web
+git checkout master
+git pull origin master
+cp -r ./* /var/www/html/
+```
+
+This says swtich the right directory, use the master branch, pull the new code down, and then copy all the new updated files to the HTTPD config directory. We also needed to install the GitHub plugin. Use the normal Polling SCM option and set the schedule to `* * * * *` or whatever it is specifically so that it runs every minute on the minute.  This is separate from the Source Management section. We chose Git and pointed it to our remote repo on Gitea. We kept everything else the same. I had to to got the Gitea repo > Settings > Webhooks and created a new webhook. The URL syntax was `<JENKINS-URL>/github-webhook/` so don't forget to put that extra HTTP route on the end of it. You can use the Test push event button at the bottom of this section. Keep branch filter as `master`. You should see a green circle next to your webhook. 
+
+Once you go back and make the change to the index.html file and push the code up, it should automatically trigger the Jenkins job after a minute. 
 
 ## Day 78: Jenkins Conditional Pipeline
 
