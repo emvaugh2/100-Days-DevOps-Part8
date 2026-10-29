@@ -12,7 +12,75 @@ We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets le
 
 ## Day 78: Jenkins Conditional Pipeline
 
+A conditional pipeline chooses which jobs to run based on what's presented to the pipeline. It's self explanatory. We need to deploy a job that will launch on the master branch or the feature branch based on which value is pased to the BRANCH string parameter. As far as the code is concerned, this looks like the same pipeline from the previous lab. I'm going to install the plugins and run those Linux commands on `stapp01` to get in front of that issue. After that, we need to set up the agent node again for App Server 1 and get that online. I'm going to go ahead and do that. Don't forget to update Java to the correct version. Of course I ran into the pettiest issue in my Agent setup. I had one trailing space in the remote directory which prevented me from launching the agent. Once that was fixed, I created my pipeline. Now, I had AI create the pipeline because I'm not used to writing Groovy and I didn't really understand the question. I will be making some of these codes by hand though so that I can make sure I really know it. 
 
+Updated code to satisfy the Kode Kloud validator. 
+
+```
+pipeline {
+    agent {
+        label 'stapp01'
+    }
+
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to deploy')
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                script {
+                    if (params.BRANCH == 'master') {
+                        sh '''
+                            cd /var/www/html
+                            git fetch origin
+                            git checkout master
+                            git pull origin master
+                        '''
+                    } else if (params.BRANCH == 'feature') {
+                        sh '''
+                            cd /var/www/html
+                            git fetch origin
+                            git checkout feature
+                            git pull origin feature
+                        '''
+                    } else {
+                        error("BRANCH must be master or feature")
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Here's my original code that worked as well. Dont use this for this lab as it will not work. 
+
+```
+pipeline {
+    agent {
+        label 'stapp01'
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                sh '''
+                    cd /var/www/html
+                    git checkout "$BRANCH"
+                    git pull origin "$BRANCH"
+                '''
+            }
+        }
+    }
+}
+```
+
+This was the code I had AI refine for me. Initially, it hardcoded the parameter value in the code. In a previously lab, we used string parameters and were able to specify what the value was prior to launching the job. So I told AI this and said this is what I would naturally do. I would put the variable in the pipeline as well. So this code is exactly how I thought about it regardless of if I knew the exact commands. 
+
+The job was successful and the App button showed the output "Updated". I think we're good here. 
+
+UPDATE: And we were in fact NOT good. We discovered that the `sarah` user actually did have credentials into the `stapp01` server. So lets forget about everything we needed to do for `tony` and just use `sarah` instead besides the update Java command. Also, apparently this is a known bug with this particular lab so I needed to update my code to he above to satisfy the Kode Kloud validator. That's dumb. My original code worked. 
 
 ## Day 77: Jenkins Deploy Pipeline
 
