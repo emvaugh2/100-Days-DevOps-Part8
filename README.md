@@ -4,7 +4,16 @@ We finished up Kubernetes so now the next 10 days are all about Jenkins! Lets le
 
 ## Day 80: Jenkins Chained Builds
 
+This was actually pretty stragihtforward. First, what's a chained build? It's when you have an upstream and a downstream build and the downstream build only starts after the upstream build is finished. You can make this more granular but that's the overall gist. I needed to create two Freestyle projects and in the triggers of the downstream build, you can choose `Build after other projects are built` and then choose your upstream project. We had to choose the stable version for our project. The rest of the lab was very straightforward. The upstream build just needed to change to the html directory using `cd /var/www/html`, use `git checkout master` to switch to the master branch, and `git pull origin master` to get the updated code. Obviously sign into Gitea and get the remote repo's URL. You'll need this in your upstream job for the Source Management input. I tested this job by adding and deleting files directly in Gitea then running the job. I would verify it worked by checking the CLI to see if the new files appeared in the directory. 
 
+Once that was confirmed, I create the downstream job with the trigger I said above. The downstream job just needed to restart HTTPD so I used `sudo systemctl restart httpd.service`. Now, this caused an issue because you needed `sarah`'s credentials. We found this out (although I already knew this was the issue) by switching the Publish Over SSH output to verbose. This is an extreme security concern BUT for this lab, we just used 
+
+```
+echo 'Sarah_pass123' | sudo -S systemctl restart httpd
+echo 'Sarah_pass123' | sudo -S systemctl is-active httpd
+```
+
+to bypass this issue. `echo` is just feeding the commands the password as needed. Once that was fixed, the downstream job was green. I tested the entire chained build and it worked. I submitted the lab and got the green check. Easy enough. 
 
 ## Day 79: Jenkins Deployment Job
 
